@@ -1,10 +1,14 @@
 import "./style.css"
-import { Render } from "./three"
+import Render from "./three"
 
 const models = ["my_animated_rooster.glb", "soft_armchair.glb"]
 const controlsEl = document.getElementById("controls")
 
-const render = new Render()
+const render = new Render({
+  pathToModels: "/models/",
+  appendToBody: false,
+  containerId: "renderer-container",
+})
 render.setupObject(models[0])
 
 models.forEach(str => {
