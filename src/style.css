@@ -51,6 +51,12 @@ body,
   border-radius: 0.5rem;
 }
 
+#loader-container {
+  display: flex;
+  width: 100%;
+  justify-content: end;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

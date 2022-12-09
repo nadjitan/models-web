@@ -36,15 +36,16 @@ export default class Render {
 
   constructor(options: {
     pathToModels: string
-    appendToBody?: boolean
-    containerId: string
+    /** If it is not set it will default to `<body>` */
+    containerId?: string
   }) {
-    let { pathToModels, appendToBody = false, containerId } = options
+    let { pathToModels, containerId } = options
+    const appendToBody = !containerId || containerId.length === 0
     this.#pathToModels = pathToModels
 
     this.#container = appendToBody
       ? document.body
-      : document.getElementById(containerId)!
+      : document.getElementById(containerId!)!
 
     this.#camera = new PerspectiveCamera(
       45,
@@ -132,7 +133,18 @@ export default class Render {
           action.play()
         })
       },
-      undefined,
+      xhr => {
+        const loader = document.querySelector(
+          "#loader-container"
+        ) as HTMLElement
+
+        if (loader) {
+          const progress = (xhr.loaded / xhr.total) * 100
+          loader.textContent = progress.toFixed(0) + "%"
+
+          if (progress === 100) loader.style.display = "none"
+        }
+      },
       error => console.error(error)
     )
 

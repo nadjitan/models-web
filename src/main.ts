@@ -6,10 +6,11 @@ const controlsEl = document.getElementById("controls")
 
 const render = new Render({
   pathToModels: "/models/",
-  appendToBody: false,
   containerId: "renderer-container",
 })
 render.setupObject(models[0])
+
+const loader = document.querySelector("#loader-container") as HTMLElement
 
 models.forEach(str => {
   const btn = document.createElement("button")
@@ -17,7 +18,8 @@ models.forEach(str => {
 
   btn.onclick = () => {
     render.setupObject(str)
+    loader.style.display = "flex"
   }
 
-  controlsEl?.appendChild(btn)
+  controlsEl?.prepend(btn)
 })
