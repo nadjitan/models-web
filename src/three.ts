@@ -67,8 +67,7 @@ export class Render {
   }
 
   /**
-   *
-   * @param container The element where the renderer will be appended to.
+   * @param container The id of an element where the renderer will be appended to.
    * @returns
    */
   setupObject<T extends string>(container: NonEmptyString<T>) {
