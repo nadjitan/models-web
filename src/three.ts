@@ -19,8 +19,6 @@ import Stats from "three/examples/jsm/libs/stats.module"
 type NonEmptyString<T> = T extends "" ? never : T
 
 export default class Render {
-  #pathToModels
-
   #renderer = new WebGLRenderer()
   #container: HTMLElement
   #scene = new Scene()
@@ -35,13 +33,11 @@ export default class Render {
   #stats = Stats()
 
   constructor(options: {
-    pathToModels: string
     /** If it is not set it will default to `<body>` */
     containerId?: string
   }) {
-    let { pathToModels, containerId } = options
+    let { containerId } = options
     const appendToBody = !containerId || containerId.length === 0
-    this.#pathToModels = pathToModels
 
     this.#container = appendToBody
       ? document.body
@@ -91,8 +87,8 @@ export default class Render {
    * @param modelFilename Filename of model with the extension. (e.g. "dog.glb")
    * @returns
    */
-  setupObject<T extends string>(modelFilename: NonEmptyString<T>) {
-    if (!modelFilename || modelFilename.length === 0) return
+  setupObject<T extends string>(modelFile: NonEmptyString<T>) {
+    if (!modelFile || modelFile.length === 0) return
     // REMOVE OBJECTS IN SCENE
     let objectsToRemove: Object3D[] = []
     this.#scene.traverse(node => {
@@ -100,15 +96,15 @@ export default class Render {
     })
     objectsToRemove.forEach(node => node.parent!.remove(node))
 
-    const buildingObj = new URL(
-      this.#pathToModels + modelFilename,
-      import.meta.url
-    )
+    // const buildingObj = new URL(
+    //   this.#pathToModels + modelFile,
+    //   import.meta.url
+    // )
 
     let mixer: AnimationMixer
 
     this.#assetLoader.load(
-      buildingObj.href,
+      modelFile,
       gltf => {
         const model = gltf.scene
         // CENTER OBJECT

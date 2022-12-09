@@ -1,11 +1,12 @@
 import "./style.css"
 import Render from "./three"
+import model1 from "../models/my_animated_rooster.glb"
+import model2 from "../models/soft_armchair.glb"
 
-const models = ["my_animated_rooster.glb", "soft_armchair.glb"]
+const models = [model1, model2]
 const controlsEl = document.getElementById("controls")
 
 const render = new Render({
-  pathToModels: "/models/",
   containerId: "renderer-container",
 })
 render.setupObject(models[0])
