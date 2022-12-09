@@ -15,7 +15,7 @@ const loader = document.querySelector("#loader-container") as HTMLElement
 
 models.forEach(str => {
   const btn = document.createElement("button")
-  btn.textContent = str
+  btn.textContent = str.substring(str.lastIndexOf("/") + 1)
 
   btn.onclick = () => {
     render.setupObject(str)
