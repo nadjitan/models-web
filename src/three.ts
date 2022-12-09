@@ -138,7 +138,7 @@ export default class Render {
           const progress = (xhr.loaded / xhr.total) * 100
           loader.textContent = progress.toFixed(0) + "%"
 
-          if (progress === 100) loader.style.display = "none"
+          if (progress >= 100) loader.style.display = "none"
         }
       },
       error => console.error(error)
