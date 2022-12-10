@@ -18,6 +18,11 @@ import Stats from "three/examples/jsm/libs/stats.module"
 // Source: https://stackoverflow.com/a/63933117
 type NonEmptyString<T> = T extends "" ? never : T
 
+type RenderOptions = Partial<{
+  /** If it is not set it will default to `<body>` */
+  containerId: string
+}>
+
 export default class Render {
   #renderer = new WebGLRenderer()
   #container: HTMLElement
@@ -32,11 +37,7 @@ export default class Render {
   #grid = new GridHelper(3, 3)
   #stats = Stats()
 
-  constructor(options: {
-    /** If it is not set it will default to `<body>` */
-    containerId?: string
-  }) {
-    let { containerId } = options
+  constructor({ containerId = "" }: RenderOptions = {}) {
     const appendToBody = !containerId || containerId.length === 0
 
     this.#container = appendToBody
@@ -84,11 +85,11 @@ export default class Render {
   }
 
   /**
-   * @param modelFilename Filename of model with the extension. (e.g. "dog.glb")
+   * @param modelPath Path to a model with the extension. (e.g. `../models/dog.glb`)
    * @returns
    */
-  setupObject<T extends string>(modelFile: NonEmptyString<T>) {
-    if (!modelFile || modelFile.length === 0) return
+  setupObject<T extends string>(modelPath: NonEmptyString<T>) {
+    if (!modelPath || modelPath.length === 0) return
     // REMOVE OBJECTS IN SCENE
     let objectsToRemove: Object3D[] = []
     this.#scene.traverse(node => {
@@ -104,7 +105,7 @@ export default class Render {
     let mixer: AnimationMixer
 
     this.#assetLoader.load(
-      modelFile,
+      modelPath,
       gltf => {
         const model = gltf.scene
         // CENTER OBJECT

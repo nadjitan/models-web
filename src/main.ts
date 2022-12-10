@@ -5,13 +5,10 @@ import model2 from "../models/soft_armchair.glb"
 
 const models = [model1, model2]
 const controlsEl = document.getElementById("controls")
+const loader = document.getElementById("#loader-container")!
 
-const render = new Render({
-  containerId: "renderer-container",
-})
+const render = new Render({ containerId: "renderer-container" })
 render.setupObject(models[0])
-
-const loader = document.querySelector("#loader-container") as HTMLElement
 
 models.forEach(str => {
   const btn = document.createElement("button")
