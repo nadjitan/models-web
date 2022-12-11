@@ -1,4 +1,5 @@
 import {
+  AmbientLight,
   AnimationMixer,
   Box3,
   Clock,
@@ -28,13 +29,14 @@ export default class Render {
   #container: HTMLElement
   #scene = new Scene()
 
-  #directionalLight = new DirectionalLight(0xffffff, 2)
+  #directionalLight = new DirectionalLight(0xfffbdb, 0.5)
+  #ambientLight = new AmbientLight(0xfffbdb, 1)
   #camera: PerspectiveCamera
-  #orbit: OrbitControls
+  #controls: OrbitControls
   #assetLoader = new GLTFLoader()
 
   #clock = new Clock()
-  #grid = new GridHelper(3, 3)
+  #grid = new GridHelper(12, 12, 0x625834)
   #stats = Stats()
 
   constructor({ containerId = "" }: RenderOptions = {}) {
@@ -51,25 +53,23 @@ export default class Render {
       1000
     )
 
-    this.#orbit = new OrbitControls(this.#camera, this.#container)
+    this.#controls = new OrbitControls(this.#camera, this.#container)
 
     this.#renderer.setSize(
       appendToBody ? window.innerWidth : this.#container.clientWidth,
       appendToBody ? window.innerHeight : this.#container.clientHeight
     )
-    this.#renderer.setClearColor(0xa3a3a3)
+    this.#renderer.setClearColor(0xfffbdb)
     this.#container.appendChild(this.#renderer.domElement)
-
-    // LIGHTING
-    this.#directionalLight.position.set(0, 32, 64)
-    this.#scene.add(this.#directionalLight)
-
-    this.#camera.position.set(4, 4, 4)
-
-    this.#orbit.update()
-
-    this.#scene.add(this.#grid)
     this.#container.appendChild(this.#stats.dom)
+
+    this.#directionalLight.position.set(15, 15, 15)
+    this.#directionalLight.castShadow = true
+
+    this.#camera.position.set(15, 15, 15)
+    this.#controls.update()
+
+    this.#scene.add(this.#grid, this.#directionalLight, this.#ambientLight)
 
     window.onresize = () => {
       this.#camera.aspect = appendToBody
@@ -84,17 +84,20 @@ export default class Render {
     }
   }
 
+  set directionalLight(intensity: number) {
+    this.#directionalLight.intensity = intensity
+  }
+
   /**
    * @param modelPath Path to a model with the extension. (e.g. `../models/dog.glb`)
-   * @returns
    */
   setupObject<T extends string>(modelPath: NonEmptyString<T>) {
     if (!modelPath || modelPath.length === 0) return
     // REMOVE OBJECTS IN SCENE
     let objectsToRemove: Object3D[] = []
-    this.#scene.traverse(node => {
-      if (node instanceof Mesh) objectsToRemove.push(node)
-    })
+    this.#scene.traverse(
+      node => node instanceof Mesh && objectsToRemove.push(node)
+    )
     objectsToRemove.forEach(node => node.parent!.remove(node))
 
     // const buildingObj = new URL(
@@ -109,11 +112,10 @@ export default class Render {
       gltf => {
         const model = gltf.scene
         // CENTER OBJECT
-        // Source: https://discourse.threejs.org/t/calculate-position-of-object-based-on-center/16990/2
         const box3 = new Box3().setFromObject(model)
         const vector = new Vector3()
         box3.getCenter(vector)
-        model.position.set(-vector.x, 0, -vector.z)
+        model.position.set(-vector.x, 0.2, -vector.z)
 
         this.#scene.add(model)
         mixer = new AnimationMixer(model)
@@ -131,9 +133,8 @@ export default class Render {
         })
       },
       xhr => {
-        const loader = document.querySelector(
-          "#loader-container"
-        ) as HTMLElement
+        // LOADING
+        const loader = document.getElementById("loader-container")
 
         if (loader) {
           const progress = (xhr.loaded / xhr.total) * 100
