@@ -153,4 +153,10 @@ export default class Render {
       this.#stats.update()
     })
   }
+
+  resetCamera() {
+    this.#controls.reset()
+    this.#camera.position.set(15, 15, 15)
+    this.#controls.update()
+  }
 }
